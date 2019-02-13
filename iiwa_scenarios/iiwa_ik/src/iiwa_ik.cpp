@@ -90,7 +90,7 @@ void iiwa_ik::Parameter_initialization()
 	Desired_EndDirZ.setZero();
 	Desired_EndPos.setZero();
 
-	cJob(0) = -60.0 * PI / 180;
+	cJob(0) = 00.0 * PI / 180;
 	cJob(1) = -30 * PI / 180;
 	cJob(2) = -0 * PI / 180;
 	cJob(3) = -60 * PI / 180;
@@ -137,16 +137,6 @@ void iiwa_ik::initKinematics()
 
 	mSKinematicChain->setJoints(JointPos.data());
 	mSKinematicChain->getEndPos(EndPos);
-	msg_robot_end.position.x = EndPos(0);
-	msg_robot_end.position.y = EndPos(1);
-	msg_robot_end.position.z = EndPos(2);
-	msg_robot_end.orientation.x = 0;
-	msg_robot_end.orientation.y = 0;
-	msg_robot_end.orientation.z = 0;
-	pub_end_of_robot_measured.publish(msg_robot_end);
-	pub_end_of_robot_measured.publish(msg_robot_end);
-	pub_end_of_robot_measured.publish(msg_robot_end);
-	pub_end_of_robot_measured.publish(msg_robot_end);
 
 	MathLib::Vector mJointVelLimitsUp;
 	MathLib::Vector mJointVelLimitsDn;
@@ -159,9 +149,11 @@ void iiwa_ik::Topic_initialization()
 	ros::NodeHandle *n = mRobot->InitializeROS();
 
 	sub_position_robot = n->subscribe("/real_r_arm_pos_controller/joint_states", 3, &iiwa_ik::chatterCallback_position, this);
+	sub_desired_position_end = n->subscribe("/IIWA/Desired_E_Pos", 3, &iiwa_ik::chatterCallback_Desired_end, this);
 	pub_command_robot_real = n->advertise<kuka_fri_bridge::JointStateImpedance>("/real_r_arm_controller/joint_imp_cmd", 3);
 
-	pub_end_of_robot_desired = n->advertise<geometry_msgs::Pose>("/IIWA/Desired_E_Pos", 3);
+	pub_end_of_robot_measured = n->advertise<geometry_msgs::Pose>("/IIWA/Real_E_Pos", 3);
+	
 
 	pub_command = n->advertise<std_msgs::Int64>("/command", 3);
 }
@@ -232,7 +224,6 @@ RobotInterface::Status iiwa_ik::RobotInit()
 	Parameter_initialization();
 
 	initKinematics();
-
 	mPlanner = PLANNER_NONE;
 	mCommand = COMMAND_NONE;
 
@@ -255,6 +246,7 @@ RobotInterface::Status iiwa_ik::RobotStart()
 
 	while (!Position_of_the_robot_recieved)
 	{
+		cout<<"Waiting for the robot's position"<<endl;
 		ros::spinOnce();
 	}
 
@@ -262,7 +254,16 @@ RobotInterface::Status iiwa_ik::RobotStart()
 
 	mSKinematicChain->setJoints(JointPos.data());
 	mSKinematicChain->getEndPos(EndPos);
+	mSKinematicChain->getEndDirAxis(AXIS_X, EndDirX);
+	mSKinematicChain->getEndDirAxis(AXIS_Y, EndDirY);
+	mSKinematicChain->getEndDirAxis(AXIS_Z, EndDirZ);
+
+	MOrientation.block(0, 0, 3, 1) = EndDirX;
+	MOrientation.block(0, 1, 3, 1) = EndDirY;
+	MOrientation.block(0, 2, 3, 1) = EndDirZ;
 	Desired_EndPos = EndPos;
+	Desired_EndDirZ=EndDirZ;
+	Desired_EndDirY=EndDirY;
 
 	return STATUS_OK;
 }
@@ -296,8 +297,17 @@ RobotInterface::Status iiwa_ik::RobotUpdate()
 			ros::spinOnce();
 			Desired_JointPos = JointPos;
 			mSKinematicChain->setJoints(JointPos.data());
-			mSKinematicChain->getEndPos(EndPos);
-			Desired_EndPos = EndPos;
+	mSKinematicChain->getEndPos(EndPos);
+	mSKinematicChain->getEndDirAxis(AXIS_X, EndDirX);
+	mSKinematicChain->getEndDirAxis(AXIS_Y, EndDirY);
+	mSKinematicChain->getEndDirAxis(AXIS_Z, EndDirZ);
+
+	MOrientation.block(0, 0, 3, 1) = EndDirX;
+	MOrientation.block(0, 1, 3, 1) = EndDirY;
+	MOrientation.block(0, 2, 3, 1) = EndDirZ;
+	Desired_EndPos = EndPos;
+	Desired_EndDirZ=EndDirZ;
+	Desired_EndDirY=EndDirY;
 			flag_init[1] = true;
 			cout << "Initialization finished" << endl;
 		}

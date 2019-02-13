@@ -108,9 +108,9 @@ class iiwa_ik : public RobotInterface
 
 	ros::Subscriber sub_orginal_DS;
 	ros::Subscriber sub_position_robot;
+	ros::Subscriber sub_desired_position_end;
 
 	ros::Publisher pub_command_robot_real;
-	ros::Publisher pub_end_of_robot_desired;
 	ros::Publisher pub_end_of_robot_measured;
 	ros::Publisher pub_command;
 
