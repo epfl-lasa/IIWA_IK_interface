@@ -1,0 +1,12 @@
+[submodule "robot-kinematics"]
+	path = robot-kinematics
+	url = git@github.com:epfl-lasa/robot-kinematics.git
+[submodule "robot-toolkit"]
+	path = robot-toolkit
+	url = git@github.com:epfl-lasa/robot-toolkit.git
+[submodule "fri-iiwa-interface"]
+	path = fri-iiwa-interface
+	url = git@github.com:epfl-lasa/fri-iiwa-interface.git
+[submodule "kuka_interface_packages"]
+	path = kuka_interface_packages
+	url = git@github.com:epfl-lasa/kuka_interface_packages.git
