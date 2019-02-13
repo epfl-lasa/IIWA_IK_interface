@@ -33,7 +33,7 @@ The Gateway of the PC connected to the robot should be 0.0.0.0.
 
 ## Installation
 1. clone repository 
-2. go inside YUMI_IK_SOLVER fold
+2. go inside IIWA_IK_interface folder
 ```
 git clone git@github.com:epfl-lasa/IIWA_IK_interface.git
 roscd
