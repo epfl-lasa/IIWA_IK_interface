@@ -35,12 +35,14 @@ The Gateway of the PC connected to the robot should be 0.0.0.0.
 1. clone repository 
 2. go inside IIWA_IK_interface folder
 ```
+roscd 
+cd ../src/IIWA_IK_interface
 git clone git@github.com:epfl-lasa/IIWA_IK_interface.git
 roscd
 cd ../src/IIWA_IK_interface
 git submodule init
 git submodule update
-cd ../
+cd ../../
 rospack profile
 catkin_make
 ```
